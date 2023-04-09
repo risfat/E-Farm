@@ -162,4 +162,32 @@ class Repository{
       return UsersResponse.withError(error.toString());
     }
   }
+
+
+  //Supply/Demand
+
+  Future<bool> setSupplyDemand({
+    required String supplyDemand,
+  }) async {
+    try {
+      final token = await getToken();
+      var response = await _dio.post('${_serverUrl}supply_demand/update',
+          options: Options(
+              headers: {
+                'Authorization': 'Bearer $token',
+                'Accept': 'application/json',
+              }),
+          data: {'supply_demand': supplyDemand});
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }else{
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+
 }

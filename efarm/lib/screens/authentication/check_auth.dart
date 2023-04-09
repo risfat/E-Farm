@@ -22,7 +22,7 @@ class CheckAuth extends StatelessWidget {
           return const LoadingWidgetLottie();
         }
         if (state is Authenticated) {
-          return state.user.type == 'Farmer' ? FarmerDashboard() : const ConsumerDashboard();
+          return state.user.type == 'Farmer' ? const FarmerDashboard() : const ConsumerDashboard();
         }
         if (state is Unauthenticated) {
           return const WelcomeScreen();

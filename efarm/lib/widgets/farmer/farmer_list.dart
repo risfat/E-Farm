@@ -2,6 +2,7 @@ import 'package:efarm/models/farmer_model.dart';
 import 'package:efarm/models/user_model.dart';
 import 'package:flutter/material.dart';
 
+import '../../helper/helper.dart';
 import '../../models/consumer_model.dart';
 
 Widget buildFarmerList(List<UserModel> farmers) {
@@ -56,7 +57,9 @@ Widget buildFarmerList(List<UserModel> farmers) {
                 ],
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Helper().launchURL("tel:${farmer.phone}");
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff8BC34A),
                   padding: const EdgeInsets.symmetric(
