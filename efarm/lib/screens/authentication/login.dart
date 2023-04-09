@@ -1,18 +1,16 @@
 import 'package:efarm/screens/authentication/signup.dart';
-import 'package:efarm/screens/farmer/farmer_dashboard.dart';
-import 'package:efarm/screens/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/auth_bloc/auth_bloc.dart';
 import '../../core/route_navigator.dart';
 import '../../helper/custom_snackbar.dart';
+import '../../helper/helper_widget.dart';
+import '../../repositories/repository.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/config.dart';
 import '../../utils/mixins.dart';
-import '../consumer/consumer_dashboard.dart';
-import 'auth.dart';
 import 'forgot_password.dart';
 
 
@@ -25,7 +23,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   bool _passwordVisible = false;
-  final GlobalKey<FormState> loginformKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -37,52 +35,34 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
   bool _isFarmerSelected = true;
 
+  void _login(String? email, String? password) async {
 
-  Future<void> signInWithEmailAndPassword(BuildContext context) async {
+    final helperWidgets = HelperWidgets();
+    helperWidgets.showLoadingDialog(context);
 
-    // show the loading dialog
-    showDialog(
-      // The user CANNOT close this dialog  by pressing outside it
-        barrierDismissible: false,
-        context: context,
-        builder: (_) {
-          return Dialog(
-            // The background color
-            backgroundColor: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  // The loading indicator
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  // Some text
-                  Text('Loading...')
-                ],
-              ),
-            ),
-          );
-        });
+    final token = await Repository().authenticate(
+      email: email ?? emailController.text,
+      password: password ?? passwordController.text,
+    );
 
-    try {
-      await Auth().signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-
-        isVerified = true;
-
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-
-      isVerified = false;
-
+    if (context.mounted) {
+      helperWidgets.hideLoadingDialog(context);
     }
+
+    if (context.mounted) {
+      if (token != null) {
+        BlocProvider.of<AuthenticationBloc>(context).add(
+          LoggedIn(token: token),
+        );
+
+        Navigator.pushNamedAndRemoveUntil(context, '/auth', (route) => false);
+
+        showCustomSnackBar(context: context, message: "You Have Been Successfully Logged In");
+      }else{
+        showCustomSnackBar(context: context, message: email == null ? "Failed To Login. Make Sure You Have Entered The Correct Credentials." : "Failed To Login. Please Try Again Later...", backgroundColor: Colors.redAccent);
+      }
+    }
+    // print(token);
 
   }
 
@@ -192,7 +172,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
               height: 10,
             ),
             Form(
-              key: loginformKey,
+              key: loginFormKey,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Column(
@@ -388,29 +368,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           borderRadius: BorderRadius.circular(15)),
                       onPressed: () {
 
-                        // signInWithEmailAndPassword(context).then((value){
-                        //
-                        //   // Close the dialog programmatically
-                        //   Navigator.of(context).pop();
-                        //   if (loginformKey.currentState!.validate() && isVerified) {
-                        //
-                        //     //SnackBar for login success
-                        //     showCustomSnackBar(context: context, message: "Successfully logged in.", backgroundColor: Colors.green);
-                        //
-                        //     navigateToPage(context, const HomeScreen(), AnimationType.slide);
-                        //
-                        //
-                        //   }else{
-                        //     showCustomSnackBar(context: context, message: "Login failed. Please Try Again.", backgroundColor: Colors.red);
-                        //   }
-                        //
-                        // });
-                        
-                        if (_isFarmerSelected) {
-                          navigateToPage(context, FarmerDashboard(), AnimationType.slide);
-                        }else{
-                          navigateToPage(context, const ConsumerDashboard(), AnimationType.slide);
-                        }
+                        _login(emailController.text, passwordController.text);
 
                       },
                       child:

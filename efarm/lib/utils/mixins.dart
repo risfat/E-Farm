@@ -16,7 +16,7 @@ mixin InputValidationMixin {
   }
 
   bool isPhoneValid(String phone) {
-    return phone.length > 11;
+    return phone.length >= 10;
   }
 
 

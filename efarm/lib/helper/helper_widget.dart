@@ -24,7 +24,7 @@ class HelperWidgets{
                     height: 15,
                   ),
                   // Some text
-                  Text('Loading...')
+                  Text('Loading...', style: TextStyle(color: Colors.white))
                 ],
               ),
             ),

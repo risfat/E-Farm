@@ -8,9 +8,9 @@ import 'authentication/login.dart';
 import 'authentication/signup.dart';
 import 'home_screen.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomeScreen extends StatelessWidget {
 
-  const WelcomePage({Key? key}) : super(key: key);
+  const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

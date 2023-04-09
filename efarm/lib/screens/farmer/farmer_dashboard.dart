@@ -1,11 +1,18 @@
+import 'package:efarm/bloc/supply_demand_bloc/supply_demand_cubit.dart';
+import 'package:efarm/helper/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/auth_bloc/auth_bloc.dart';
+import '../../helper/custom_snackbar.dart';
 import '../../models/consumer_model.dart';
 import '../../utils/app_constant.dart';
 import '../../widgets/consumer/consumer_list.dart';
 
 class FarmerDashboard extends StatefulWidget {
+  const FarmerDashboard({super.key});
+
   @override
   _FarmerDashboardState createState() => _FarmerDashboardState();
 }
@@ -21,7 +28,6 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     });
   }
 
-  final List<Consumer> _consumers = [    Consumer(      name: 'John Doe',      address: '123 Main St, Anytown, USA',      mobileNo: '+1 555-123-4567',      todayDemand: '50 kg',    ),    Consumer(      name: 'Jane Smith',      address: '456 Oak Ave, Anycity, USA',      mobileNo: '+1 555-987-6543',      todayDemand: '100 kg',    ),    Consumer(      name: 'Bob Johnson',      address: '789 Maple Blvd, Anyville, USA',      mobileNo: '+1 555-555-1212',      todayDemand: '25 kg',    ),  ];
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +48,27 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
         ),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              // Logout functionality
+              if (context.mounted) {
+                BlocProvider.of<AuthenticationBloc>(context).add(
+                  const LoggedOut(),
+                );
+                // Navigator.pushNamed(context, '/');
+                showCustomSnackBar(
+                    context: context,
+                    message: "You Have Been Successfully Logged Out",
+                    backgroundColor: Colors.redAccent);
+              }
+            },
+            child: const IconButton(
+              icon: Icon(Icons.exit_to_app),
+              onPressed: null,
+            ),
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       body: Column(
@@ -149,8 +176,30 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
           ),
           Expanded(
             child: Container(
-              padding: EdgeInsets.all(16),
-              child: buildConsumerList(_consumers),
+              padding: const EdgeInsets.all(16),
+              child: BlocProvider(
+                create: (context) =>
+                SupplyDemandCubit()
+                  ..init(),
+                child: BlocBuilder<SupplyDemandCubit, SupplyDemandState>(
+                  builder: (context, state) {
+
+                    if (state.status == Status.failure) {
+                      return const Center(
+                          child: Text(
+                            'Something went wrong! Please try again later.',
+                            style: TextStyle(color: Colors.black45),
+                          ));
+                    }
+                    if (state.status == Status.success) {
+                      return buildConsumerList(state.users);
+                    }
+
+                    return const LoadingWidget();
+
+                  },
+                ),
+              ),
             ),
           )
         ],

@@ -1,14 +1,15 @@
 import 'package:efarm/models/farmer_model.dart';
+import 'package:efarm/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/consumer_model.dart';
 
-Widget buildFarmerList(List<Farmer> farmers) {
+Widget buildFarmerList(List<UserModel> farmers) {
   return ListView.builder(
     itemCount: farmers.length,
     shrinkWrap: true,
     itemBuilder: (context, index) {
-      Farmer farmer = farmers[index];
+      UserModel farmer = farmers[index];
       return Card(
         elevation: 2,
         child: Padding(
@@ -37,7 +38,7 @@ Widget buildFarmerList(List<Farmer> farmers) {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Mobile No: ${farmer.mobileNo}',
+                    'Mobile No: ${farmer.phone}',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.grey[600],
@@ -45,7 +46,7 @@ Widget buildFarmerList(List<Farmer> farmers) {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Today\'s Supply: ${farmer.todaySupply}',
+                    'Today\'s Supply: ${farmer.supplyDemand == '' ? 'None' : farmer.supplyDemand}',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.grey[600],

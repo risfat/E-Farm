@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/auth_bloc/auth_bloc.dart';
+import '../../bloc/supply_demand_bloc/supply_demand_cubit.dart';
+import '../../helper/custom_snackbar.dart';
+import '../../helper/loading_widget.dart';
 import '../../models/consumer_model.dart';
 import '../../models/farmer_model.dart';
 import '../../utils/app_constant.dart';
@@ -46,6 +51,29 @@ class _ConsumerDashboardState extends State<ConsumerDashboard> {
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
         ),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              // Logout functionality
+              if (context.mounted) {
+                BlocProvider.of<AuthenticationBloc>(context)
+                    .add(
+                  const LoggedOut(),
+                );
+                // Navigator.pushNamed(context, '/');
+                showCustomSnackBar(
+                    context: context,
+                    message:
+                    "You Have Been Successfully Logged Out",
+                    backgroundColor: Colors.redAccent);
+              }
+            },
+            child: const IconButton(
+              icon: Icon(Icons.exit_to_app),
+              onPressed: null,
+            ),
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       body: Column(
@@ -154,7 +182,29 @@ class _ConsumerDashboardState extends State<ConsumerDashboard> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16),
-              child: buildFarmerList(_farmers),
+              child: BlocProvider(
+                create: (context) =>
+                SupplyDemandCubit()
+                  ..init(),
+                child: BlocBuilder<SupplyDemandCubit, SupplyDemandState>(
+                  builder: (context, state) {
+
+                    if (state.status == Status.failure) {
+                      return const Center(
+                          child: Text(
+                            'Something went wrong! Please try again later.',
+                            style: TextStyle(color: Colors.black45),
+                          ));
+                    }
+                    if (state.status == Status.success) {
+                      return buildFarmerList(state.users);
+                    }
+
+                    return const LoadingWidget();
+
+                  },
+                ),
+              ),
             ),
           )
         ],
