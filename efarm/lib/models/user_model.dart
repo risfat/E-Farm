@@ -25,7 +25,7 @@ class UserModel extends Equatable {
         name = json['name'],
         phone = json['phone'],
         type = json['type'],
-        address = json['address'],
+        address = json['address'] ?? "Not Available",
         email = json['email'],
         emailVerifiedAt = json['email_verified_at'].toString(),
         twoFactorConfirmedAt = json['two_factor_confirmed_at'].toString(),
@@ -33,7 +33,7 @@ class UserModel extends Equatable {
         createdAt = json['created_at'].toString(),
         updatedAt = json['updated_at'].toString(),
         profilePhotoUrl = json['profile_photo_url'] ?? "",
-        supplyDemand = json['supply_demand'] != null && json['supply_demand'].isNotEmpty ? json['supply_demand'][0]['supply_demand'] : "",
+        supplyDemand = json['supply_demand'] != null && json['supply_demand'].isNotEmpty ? json['supply_demand'][0]['supply_demand'] ?? "" : "",
         status = json['status'] ?? "";
 
   @override

@@ -24,10 +24,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   bool _passwordVisible = false;
   final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
   final passwordController = TextEditingController();
 
-  bool errorEmail = false;
+  bool errorPhone = false;
   bool errorPass = false;
 
   String? errorMessage = '';
@@ -35,13 +35,13 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
   bool _isFarmerSelected = true;
 
-  void _login(String? email, String? password) async {
+  void _login(String? phone, String? password) async {
 
     final helperWidgets = HelperWidgets();
     helperWidgets.showLoadingDialog(context);
 
     final token = await Repository().authenticate(
-      email: email ?? emailController.text,
+      phone: phone ?? phoneController.text,
       password: password ?? passwordController.text,
     );
 
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
         showCustomSnackBar(context: context, message: "You Have Been Successfully Logged In");
       }else{
-        showCustomSnackBar(context: context, message: email == null ? "Failed To Login. Make Sure You Have Entered The Correct Credentials." : "Failed To Login. Please Try Again Later...", backgroundColor: Colors.redAccent);
+        showCustomSnackBar(context: context, message: phone == null ? "Failed To Login. Make Sure You Have Entered The Correct Credentials." : "Failed To Login. Please Try Again Later...", backgroundColor: Colors.redAccent);
       }
     }
     // print(token);
@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   @override
   void dispose(){
     super.dispose();
-    emailController.dispose();
+    phoneController.dispose();
     passwordController.dispose();
   }
 
@@ -179,11 +179,11 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                   children: [
                     Row(
                       children: [
-                        !errorEmail
+                        !errorPhone
                             ? const Padding(
                                 padding: EdgeInsets.only(bottom: 5),
                                 child: Icon(
-                                  Icons.alternate_email_outlined,
+                                  Icons.phone,
                                   color: Colors.grey,
                                   size: 20,
                                 ),
@@ -191,7 +191,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                             : const Padding(
                                 padding: EdgeInsets.only(bottom: 50),
                                 child: Icon(
-                                  Icons.alternate_email_outlined,
+                                  Icons.phone,
                                   color: Constant.primaryColor,
                                   size: 20,
                                 ),
@@ -203,24 +203,24 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           child: SizedBox(
                             height: 50,
                             child: TextFormField(
-                              keyboardType: TextInputType.emailAddress,
+                              keyboardType: TextInputType.phone,
                               style: const TextStyle(
                                 fontSize: 14,
                               ),
                               textInputAction: TextInputAction.next,
-                              controller: emailController,
+                              controller: phoneController,
                               // ignore: body_might_complete_normally_nullable
-                              validator: (email) {
-                                if (isEmailValid(email!)) {
+                              validator: (phone) {
+                                if (isPhoneValid(phone!)) {
                                   setState(() {
-                                    errorEmail = false;
+                                    errorPhone = false;
                                   });
                                   return null;
                                 } else {
                                   setState(() {
-                                    errorEmail = true;
+                                    errorPhone = true;
                                   });
-                                  return 'Enter valid Email';
+                                  return 'Enter valid Phone Number';
                                 }
                               },
                               decoration: const InputDecoration(
@@ -229,7 +229,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                                 hintStyle: TextStyle(
                                   fontSize: 14,
                                 ),
-                                hintText: 'Email ID',
+                                hintText: 'Mobile Number',
                               ),
                             ),
                           ),
@@ -368,7 +368,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           borderRadius: BorderRadius.circular(15)),
                       onPressed: () {
 
-                        _login(emailController.text, passwordController.text);
+                        _login(phoneController.text, passwordController.text);
 
                       },
                       child:

@@ -55,7 +55,7 @@ class Repository{
   }
 
   Future<String?> authenticate({
-    required String email,
+    required String phone,
     required String password,
   }) async {
     try {
@@ -64,7 +64,7 @@ class Repository{
               headers: {
                 'Accept': 'application/json',
               }),
-          data: {'email': email, 'password': password});
+          data: {'phone': phone, 'password': password});
 
       if (response.statusCode == 200 && response.data != '') {
         persistToken(response.data);
@@ -73,6 +73,7 @@ class Repository{
         return null;
       }
     } catch (error) {
+      print(error);
       return null;
     }
   }
@@ -89,13 +90,13 @@ class Repository{
     try {
       var response = await _dio.post('${_serverUrl}register',
           options: Options(
-              receiveDataWhenStatusError: true,
+              // receiveDataWhenStatusError: true,
               headers: {
                 'Accept': 'application/json',
               }),
           data: {'name': name, 'phone': phone, 'email': email, 'password': password, 'address':address, 'type': type});
       if (response.statusCode == 201 && response.data != '') {
-        final token = await authenticate(email: email, password: password);
+        final token = await authenticate(phone: phone, password: password);
         if (token != null) {
           result['hasError'] = false;
           result['user'] = UserModel.fromJson(response.data);
@@ -105,9 +106,9 @@ class Repository{
     } catch (exception) {
       if (exception.runtimeType == DioError) {
         var dioException = exception as DioError;
-        // if (kDebugMode) {
-        //   print("Exception Data: ${dioException.response?.data}");
-        // }
+        if (kDebugMode) {
+          print("Exception Data: ${dioException.response?.data}");
+        }
         if(dioException.response?.statusCode == 422){
           result['hasError'] = true;
           result['error'] = AuthErrorModel.fromJson(dioException.response?.data);
